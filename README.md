@@ -2,6 +2,7 @@
 
 #절차
 1.preprocessing.py 실행으로 데이터를 train, test, val 로 구분
+
 2.training.py 
 
 # 주의사항
