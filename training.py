@@ -49,7 +49,7 @@ if __name__ == "__main__":
 	#Model.compile에 관하여 : https://keras.io/models/model/
 	#optimizer : 옵티마이저 선택 
 	#loss : 손실함수 선택
-	#img 신경망 출력에서는 categorical_crossentropy를, bbox 출력에는 mse를 사용하겠다는 의미
+	#img 신경망 출력에서는 categorical_crossentropy를 사용하겠다는 의미
 
 	final_model.compile(optimizer=opt,
 	                    loss={'img': 'categorical_crossentropy'},
