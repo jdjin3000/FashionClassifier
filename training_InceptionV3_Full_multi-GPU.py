@@ -55,7 +55,6 @@ with strategy.scope():
                         loss={'img': 'categorical_crossentropy'},
                         metrics={'img': ['accuracy', 'top_k_categorical_accuracy']}) # default: top-5
 
-print("1111111111111111111111111111111111111111111")
 #데이터에 약간의 변화를 주어 학습할 데이터를 양산하는 것인듯
 train_datagen = ImageDataGenerator(rotation_range=30.,
                                    shear_range=0.2,
@@ -66,18 +65,16 @@ train_datagen = ImageDataGenerator(rotation_range=30.,
                                    rescale=1.255
                                    )
 test_datagen = ImageDataGenerator(rescale=1./255)
-print("22222222222222222222222222222222222222222")
 #train_iterator = DirectoryIterator(os.path.join(classify_path, "train"), train_datagen, target_size=(200, 200))
 #test_iterator = DirectoryIterator(os.path.join(classify_path, "val"), test_datagen,target_size=(200, 200))
 
 #flow_from_directory에서 알아서 directory 별 클래스를 나눔 여기서 라벨이 붙는것
 #train_iterator.class_indices에 번호와 분류가 매핑되어 있고
 #train_iterator.classes에 사진별 분류(번호)가 리스트로 저장되어 있다.
-print("#3333333333333333333333333333333333333333")
+
 train_iterator = train_datagen.flow_from_directory(os.path.join(bbox_path, "train"), class_mode='categorical', batch_size=32,shuffle=False)
-print("444444444444444444444444444444444444444444444")
 test_iterator = test_datagen.flow_from_directory(os.path.join(bbox_path, "val"), class_mode='categorical', batch_size=32,shuffle=False)
-print("555555555555555555555555555555555555")
+
 """
 print(dir(train_iterator))
 print(train_iterator.directory)
