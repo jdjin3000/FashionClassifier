@@ -1,9 +1,11 @@
 from sklearn.datasets import load_files
 from sklearn.manifold import TSNE
 from skimage.io import imread_collection
+from skimage.transform import resize
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+import pickle
 
 anno_path = './Anno'
 eval_path = './Eval'
@@ -20,7 +22,7 @@ def load_images_from_subdirectories():
     for sub_ in subdirectories.keys():
         for img_ in imread_collection(os.path.join(bboxForTsne_path, sub_) +'/*.jpg'):
         	target.append(sub_)
-        	data.append(img_.ravel())
+        	data.append(resize(img_).ravel())
 
     return np.array(data), target, subdirectories
 
@@ -28,6 +30,9 @@ data, target, target_num = load_images_from_subdirectories()
 
 tsne = TSNE(random_state=0)
 data_tsne = tsne.fit_transform(data)
+
+filename = 'tsne_model.sav'
+pickle.dump(tsne, open(filename, 'wb'))
 
 for x, y, tg in zip(data_tsne[:, 0], data_tsne[:, 1], target):
 	plt.scatter(x, y, c=color[target_num[tg]])
