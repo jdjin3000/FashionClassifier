@@ -10,6 +10,16 @@ from tensorflow.keras import backend as K
 import os
 from contextlib import redirect_stdout
 
+def single_class_precision(interesting_class_id):
+    def prec(y_true, y_pred):
+        class_id_true = K.argmax(y_true, axis=-1)
+        class_id_pred = K.argmax(y_pred, axis=-1)
+        precision_mask = K.cast(K.equal(class_id_pred, interesting_class_id), 'int32')
+        class_prec_tensor = K.cast(K.equal(class_id_true, class_id_pred), 'int32') * precision_mask
+        class_prec = K.cast(K.sum(class_prec_tensor), 'float32') / K.cast(K.maximum(K.sum(precision_mask), 1), 'float32')
+        return class_prec
+    return prec
+
 anno_path = './Anno'
 eval_path = './Eval'
 classify_path ='./classify'
@@ -28,7 +38,7 @@ for layer in final_model.layers:
     print(layer.output_shape)
 """
 
-for layer in model_InceptionV3.layers[:-12]:
+for layer in model_InceptionV3.layers[:]:
     layer.trainable =True
 
 
@@ -40,29 +50,34 @@ y = Dense(46, activation='softmax', name='img')(x)
 final_model = Model(inputs=model_InceptionV3.input, outputs=y)
 
 
-
-#optimizer로 Stochastic Gradient Descent 사용
-opt = SGD(lr=0.0001, momentum=0.9, nesterov=True)
-
 #Model.compile에 관하여 : https://keras.io/models/model/
 #optimizer : 옵티마이저 선택 
 #loss : 손실함수 선택
 #img 신경망 출력에서는 categorical_crossentropy를, bbox 출력에는 mse를 사용하겠다는 의미
 
-final_model.compile(optimizer=opt,
-                    loss={'img': 'categorical_crossentropy'},
-                    metrics={'img': ['accuracy', 'top_k_categorical_accuracy']}) # default: top-5
+metrics_list = ['accuracy'] # + 'top_k_categorical_accuracy'
+for i in range(46):
+  metrics_list.append(single_class_precision(i))
+
+print('metrics_list has...')
+print(metrics_list)
+
+final_model.compile(optimizer='adam',
+                    loss='categorical_crossentropy',
+                    metrics=metrics_list)
 
 
 #데이터에 약간의 변화를 주어 학습할 데이터를 양산하는 것인듯
+#학습시 rescale을 1/255로 했으니 테스트 시에도 그래야
 train_datagen = ImageDataGenerator(rotation_range=30.,
                                    shear_range=0.2,
                                    zoom_range=0.2,
                                    width_shift_range=0.2,
                                    height_shift_range=0.2,
-                                   horizontal_flip=True
+                                   horizontal_flip=True,
+                                   rescale=1.0/255.0
                                    )
-test_datagen = ImageDataGenerator()
+test_datagen = ImageDataGenerator(rescale=1.0/255.0)
 
 #train_iterator = DirectoryIterator(os.path.join(classify_path, "train"), train_datagen, target_size=(200, 200))
 #test_iterator = DirectoryIterator(os.path.join(classify_path, "val"), test_datagen,target_size=(200, 200))
@@ -107,7 +122,7 @@ checkpoint = ModelCheckpoint('./models/model.h5')
 #training
 final_model.fit_generator(train_iterator,
                           steps_per_epoch=1000,
-                          epochs=200, validation_data=test_iterator,
+                          epochs=250, validation_data=test_iterator,
                           validation_steps=200,
                           verbose=1,
                           shuffle=True,
