@@ -55,9 +55,9 @@ final_model = Model(inputs=model_InceptionV3.input, outputs=y)
 #loss : 손실함수 선택
 #img 신경망 출력에서는 categorical_crossentropy를, bbox 출력에는 mse를 사용하겠다는 의미
 
-metrics_list = ['accuracy'] # + 'top_k_categorical_accuracy'
-for i in range(46):
-  metrics_list.append(single_class_precision(i))
+metrics_list = ['accuracy', 'top_k_categorical_accuracy'] # + 'top_k_categorical_accuracy'
+# for i in range(46):
+#   metrics_list.append(single_class_precision(i))
 
 print('metrics_list has...')
 print(metrics_list)
