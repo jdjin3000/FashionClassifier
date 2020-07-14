@@ -1,14 +1,6 @@
-# FashionClassifier-With-Deepfashion
+# Fashion Classifier
 
-#절차
-
-1.seperateImg.py 실행으로 데이터를 train, test, val 로 구분
-
-2.ML 코드 실행
-
-# 주의사항
-1.No such file or directory 오류 발생 시
- : 직접 수동으로 폴더를 생성하면 정상적으로 작동함.
-
-2.multi-processing Option 사용 불가
- : 해결하였으나, shuffle 기능을 사용할 수 없어 더 조사가 
+## 구성
+1. /DeepFashion : DeepFashion Dataset을 사용해 분류기 학습
+2. /customDataset : 크롤링을 통한 의류 카테고리 14개, 색상 카테고리 14개 분류를 가진 데이터셋을 만들어 학습
+3. /customDataset/preprocessing : 배경 제거, 인물 크롭(Crop), 상의 크롭 등의 기능을 가진 전처리 코드
